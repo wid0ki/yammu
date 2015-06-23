@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+    
+<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+<script src="/static/js/script.js" type="application/javascript"></script>
+    
+<title>Yammu - Вход</title>
+</head>
+    
+    <body>
+        <div class="header" id="login">
+            <a href="index.html"><img src='{{ static_url("img/logo.png")}}' alt="Yammu"/></a>
+        </div>
+        <div id="content_login">
+            <form id="login_form">
+                <input type="text" name="email" placeholder="  email" class="textline"><br/>
+                <input type="text" name="password" placeholder="  пароль" class="textline"><br/>
+                <button type="submit">Войти</button><br/>
+                <span id="register"><a href="">Забыли пароль?</a><br/></span>
+            </form>
+                <span id="register">Ещё не с нами &mdash; <a href="">Регистрируйся</a></span>
+        </div>
+        <div id="footer">
+            <div class="divider">
+                <img src="../static/img/line.png" alt="Просто линия"/>
+            </div>
+            <div class="right">
+                <p class="pale">
+                    2015<br/>
+                    Дипломная работа<br/>
+                    <a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a>
+                </p>
+            </div>
+        </div>
+    </body>
+
+</html>

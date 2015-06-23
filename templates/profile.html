@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+    
+<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+<script src="/static/js/script.js" type="application/javascript"></script>
+    
+<title>Yammu - Профиль</title>
+</head>
+
+<body name="top">
+    <div class="drop"></div>
+    <div id="header">
+        <ul class="menu">
+            <li><a href="index.html"><img src='{{ static_url("img/logo.png")}}' alt="Yammu"/></a></li>
+            <li><a href="../templates/projects.html">Проекты</a></li>
+            <li><a href="timeline.html">Активности</a></li>
+            <li class="active"><a href="profile.html">Профиль</a></li>
+            <li><a href="add_project.html"><img id="img_drop" src='{{ static_url("img/plus.png")}}' alt="Добавить проект" /></a></li>
+        </ul> 
+    </div>
+    
+    <div id="content_login">
+        
+        <form id="about">
+            <input type="text" name="name" value="  {{ escape(person['name']) }}" class="textline"><br/>
+            <input type="text" name="email" value="  {{ escape(person['email']) }}" class="textline"><br/>
+        </form> 
+        <div class="tabbar">
+            <p>Получать уведомления на <b>{{ escape(person['email']) }}</b> об изменениях в проектах:</p>
+
+            <input type="radio" name="subscribe" value="never" onclick="" id="never"/>
+            <label for="never">никогда</label>
+
+            <input type="radio" checked="checked" name="subscribe" value="asis" onclick="" id="asis"/>
+            <label for="asis">при появлении</label>
+
+            <input type="radio" name="subscribe" value="daily" onclick="" id="daily"/>
+            <label for="daily">раз в день</label>
+
+            <input type="radio" name="subscribe" value="week" onclick="" id="week"/>
+            <label for="week">раз в неделю</label>
+
+        </div>
+               
+        <form id="passwd">
+            <input type="password" name="oldpass" placeholder="  старый пароль" class="textline"><br/>
+            <input type="password" name="newpass" placeholder="  новый пароль" class="textline"><br/>
+            <button type="submit">Сменить</button><br/>
+        </form>
+        
+    </div>
+    
+    <div id="footer">
+        <div class="divider">
+            <img src="../static/img/line.png" alt="Просто линия"/>
+        </div>
+        <div class="right">
+            <p class="pale">
+                2015<br/>
+                Дипломная работа<br/>
+                <a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+    
+<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+<script src="/static/js/script.js" type="application/javascript"></script>
+    
+<title>Yammu - Проекты</title>
+</head>
+
+<body name="top">
+    <div class="drop"></div>
+    <div id="header">
+        <ul class="menu">
+            <li><a href="index.html"><img src='{{ static_url("img/logo.png")}}' alt="Yammu"/></a></li>
+            <li class="active"><a href="projects.html">Проекты</a></li>
+            <li><a href="timeline.html">Активности</a></li>
+            <li><a href="profile.html">Профиль</a></li>
+            <li><a href="add_project.html"><img id="img_drop" src='{{ static_url("img/plus.png")}}' alt="Добавить проект" /></a></li>
+        </ul> 
+    </div>
+    
+    <div class="grid">
+       {% for project in projects %}
+        <div class="col-1-4">
+            <a href="project.html/?project_id={{project['id']}}">
+                <img src={{project['image_path']}} alt="{{project['name']}}"/>
+                <h2>{{project['name']}}</h2>
+            </a>
+        </div>
+       {% end %}
+    </div>
+    
+    <div id="footer">
+        <div class="left">
+            <p>это всё!<br/><a href="#top">наверх</a></p>
+            <img src='{{ static_url("img/up.png")}}' alt="К началу страницы"/>
+        </div>
+        <div class="divider">
+            <img src="../static/img/line.png" alt="Просто линия"/>
+        </div>
+        <div class="right">
+            <p class="pale">
+                2015<br/>
+                Дипломная работа<br/>
+                <a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

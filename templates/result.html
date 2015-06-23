@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<link rel="stylesheet" type="text/css" media="print" href="{{ static_url('css/print.css') }}">
+<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+    
+<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+<script src="/static/js/script.js" type="application/javascript"></script>
+    
+<title>{{escape (project['name'])}}|{{escape (research['name'])}}</title>
+</head>
+
+<body name="top">
+    <div class="drop"></div>
+    <div id="header">
+        <ul class="menu">
+            <li><a href="index.html"><img src='{{ static_url("img/logo.png")}}' alt="Yammu"/></a></li>
+            <li class="active"><a href="../templates/projects.html">Проекты</a></li>
+            <li><a href="timeline.html">Активности</a></li>
+            <li><a href="profile.html">Профиль</a></li>
+            <li><a href="add_project.html"><img id="img_drop" src='{{ static_url("img/plus.png")}}' alt="Добавить проект" /></a></li>
+        </ul> 
+    </div>
+    <div class="breadcrumbs">
+        <p><a href="project.html/?project_id={{project['id']}}" class="bread">{{project['name']}}</a> > <a href="research.html/{{research['id']}}" class="bread">{{research['name']}}</a></p>
+    </div>
+    <div id="researchdescription">
+        <div class="left_pr">
+            <h2>Результаты</h2>
+            <p class="persent">74%<span class="pcpale">/100</span></p><br/>
+        </div>
+        <div class="right_pr">
+            <span class="pcpale">{{participants_count}} участники</span>
+            <br/>
+            <button href="#" onClick="window.print();"> Распечатать</button>
+            <a href="" id="smallink" style="padding-left: 20px;">Отправить</a><br/>
+        </div>
+    </div>
+    
+    {% for method in methods %}
+    <div id="resultmetric">
+        <a href="#" onclick="openbox('extendmetric'); return false">
+            <img src="{{ static_url("img/open.png")}}" class="arrow" alt="Стрелка"/>
+            {{parent_methods.pop(0)}}
+        </a>
+        <div class="extendmetric" style="display: block;">
+            {% for ch in method %}
+            <p class="scription">{{ch['name']}}</p>
+            {% end %}
+        </div>
+    </div>
+    {% end %}
+    
+    <div id="footer">
+        <div class="left">
+            <p>это всё!<br/><a href="#top">наверх</a></p>
+            <img src='{{ static_url("img/up.png")}}' alt="К началу страницы"/>
+        </div>
+        <div class="divider">
+            <img src="../static/img/line.png" alt="Просто линия"/>
+        </div>
+        <div class="right">
+            <p class="pale">
+                2015<br/>
+                Дипломная работа<br/>
+                <a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

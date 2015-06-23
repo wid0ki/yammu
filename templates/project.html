@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+    
+<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+<script src="/static/js/script.js" type="application/javascript"></script>
+    
+<title>{{escape (project['name'])}}</title>
+</head>
+
+<body name="top">
+    <div class="drop"></div>
+    <div id="header">
+        <ul class="menu">
+            <li><a href="index.html"><img src='{{ static_url("img/logo.png")}}' alt="Yammu"/></a></li>
+            <li class="active"><a href="../templates/projects.html">Проекты</a></li>
+            <li><a href="timeline.html">Активности</a></li>
+            <li><a href="profile.html">Профиль</a></li>
+            <li><a href="add_project.html"><img id="img_drop" src='{{ static_url("img/plus.png")}}' alt="Добавить проект" /></a></li>
+        </ul> 
+    </div>
+
+    <div id="projectdescription">
+        <div class="left_pr">
+            <h2>{{project['name']}}</h2>
+            <img src={{project['image_path']}} alt="{{project['name']}}"/>     
+        </div>
+        <div class="right_pr">
+            <span class="pcpale">{{participants_count}} участники</span><br/>
+            <div class="result">
+                <p class="persent">74%<span class="pcpale">/100</span></p><br/>
+                <a href="research.html/{{researchs[0]['id']}}" id="smallink">Смотреть результаты</a><br/>
+            </div>
+            <button type="submit">Тестировать</button><br/>
+        </div>
+    </div>
+    
+    <div id="description">
+        <a href="#" onclick="openbox('extendescription'); return false" id="descriptioname">
+            <img src="{{ static_url("img/open.png")}}" class="arrow" alt="Стрелка"/>
+            Описание
+        </a>
+        <div id="extendescription">
+            <p class="scription">{{project['description']}}</p>
+        </div>
+    </div>
+        
+    <div id="research">
+        <a href="#" onclick="openbox('extendresearch'); return false" id="researchname">
+            <img src="{{ static_url("img/open.png")}}" class="arrow" alt="Стрелка"/>
+            Исследования
+        </a>
+        <div id="extendresearch">
+            {% for research in researchs %}
+                <p class="scription"><a href="research.html/{{research['id']}}">{{research['date']}}</a>
+                {{research['description']}}</p>
+           {% end %}
+        </div>
+    </div>
+    
+    <div id="footer">
+        <div class="left">
+            <p>это всё!<br/><a href="#top">наверх</a></p>
+            <img src='{{ static_url("img/up.png")}}' alt="К началу страницы"/>
+        </div>
+        <div class="divider">
+            <img src="../static/img/line.png" alt="Просто линия"/>
+        </div>
+        <div class="right">
+            <p class="pale">
+                2015<br/>
+                Дипломная работа<br/>
+                <a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

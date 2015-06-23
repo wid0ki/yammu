@@ -1,0 +1,473 @@
+/*Главная страница*/
+
+#header, a {
+    padding-top: 20px;
+    font-family: PTSans-Regular;
+    font-size: 24px;
+    color: #0096E6;
+    line-height: 32px;
+    text-decoration: none;
+    vertical-align: middle;
+    margin-bottom: 30px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+p {
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    color: #212121;
+}
+
+p.pale {
+    color: #9B9B9B;
+    padding-left: 50%;
+    padding-top: 20%;
+}
+
+p.calling {
+    margin-top: 2%;
+    margin-bottom: 2%;
+    font-family: PTSans-Regular;
+    font-size: 64px;
+    color: #212121;
+    line-height: 84px;
+}
+
+span.highlight {
+    color: #0096E6;
+}
+
+button{
+    text-decoration:none; 
+    text-align:center; 
+    border:solid 3px #0096e6; 
+    font:24px PTSans-Regular; 
+    background: transparent;
+    color:#212121; 
+    width: 220px;
+    height: 60px;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+button:hover {
+    color: #0096E6;
+}
+
+ul.menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+    text-align: justify;
+    text-justify: newspaper;
+}
+
+ul.menu li {
+    vertical-align: middle;
+    display: inline-block;
+    line-height: normal;
+    margin-bottom: 20px;
+    color: #0096E6;
+    line-height: 32px;
+    text-decoration: none;
+}
+
+.drop {
+    position: absolute;
+    right: 136px;
+    width: 120px;
+    height: 120px;
+    background: #F0F9FF;
+    border-radius: 0 100% 100% 100%;
+    -webkit-transform: rotate(-40deg);
+    -moz-transform: rotate(-40deg);
+    -o-transform: rotate(-40deg);
+    z-index: -1;
+}
+
+ul.menu:after {
+    width: 100%;
+    height: 0;
+    visibility: hidden;
+    overflow: hidden;
+    content: '';
+    display: inline-block;
+}
+
+div {
+    width: 940px; 
+    height: auto;
+    margin: 0 auto;
+}
+
+#content_login {
+    padding-top: 20px;
+    text-align: center;
+}
+
+/*Подвал*/
+
+#footer a{
+    font-size: 20px;
+}
+
+div.left {
+    margin: auto;
+    width: 50%;
+    min-height: 230px;
+    float: left;
+    z-index: 1;
+}
+
+div.right {
+    margin: auto;
+    width: 50%;
+    min-height: 230px; 
+    margin-left: 50%;
+    z-index: 1;
+}
+
+div.divider {
+    position: absolute;
+    z-index: -1;
+}
+
+/*Страница логина*/
+
+.header#login {
+    margin: auto;
+    text-align: center;
+    padding-top: 30px;
+}
+
+#login_form {
+    margin: 0 auto;
+    text-align: center;
+    border: 1px solid #979797;
+    border-radius: 4px;
+    width: 340px;
+    height: auto;
+    vertical-align: middle;
+    padding-top: 30px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.login_form ::-webkit-input-placeholder {
+    color: #afafaf
+}
+
+.textline {
+    position:relative;
+    margin-bottom: 2%;
+    margin-top: 2%;
+    text-align:left; 
+    background: #FAF9FB;
+    border: 1px solid #9B9B9B ;
+    font:24px PTSans-Regular; 
+    color:#212121; 
+    height: 60px;
+    width: 215px;
+    display:table-cell;
+    vertical-align:middle;
+}
+
+span#register {
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    color: #9B9B9B;
+    line-height: 26px;
+    margin-bottom: 5%;
+}
+
+span#register a {
+    font-size: 20px;
+}
+
+/*Страница проектов*/
+
+h2 {
+    margin: auto;
+    font-family: PTSans-Regular;
+    font-size: 24px;
+    color: #4A90E2;
+    line-height: 32px;
+    padding-bottom: 20px;
+}
+
+.grid {
+    overflow: hidden; 
+    width: 940px;
+    position:relative;
+}
+
+.col-1-4 {
+    float: left; 
+    width: 30%; 
+    margin-right: 3.3%;
+}
+
+.col-3-4 {
+    margin: auto;
+    padding: 0;
+    float: right; 
+    width: 70%; 
+    margin-right: 3.3%;;
+}
+
+.grid:after {
+    margin-right: 0;
+}
+
+/*Страница проекта*/
+
+div.projectdescription {
+    margin: auto;
+    padding-top: -40px;
+}
+
+#description, #research, #resultmetric {
+    margin: auto;
+    position: relative;
+    width: 940px;
+    border: 1px solid #D0E8F9;
+    padding: 20px;
+    vertical-align: middle;
+}
+
+#description {
+    margin-top: 20px;
+}
+
+#researchname, #descriptioname {
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    color: #0096E6;
+    line-height: 26px;
+    padding: 0;
+}
+
+#extendresearch, #extendescription, .extendmetric {
+    display: none;
+    margin-top: 10px;
+    background: #FAF9FB;
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    color: #212121;
+    line-height: 26px;
+    padding: 10px;;
+    width: auto;
+}
+
+.scription {
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    color: #212121;
+    line-height: 26px;
+    border-bottom: 1px solid #D0E8F9;
+}
+
+.scription > p {
+    padding: 0;
+    margin: auto;
+}
+
+.scription > a {
+    padding: 0;
+    padding-right: 20px;
+}
+
+img.arrow {
+    margin: auto;
+    position: static;
+    align-content: center;
+}
+
+span.pale {
+    color: #9B9B9B;
+    padding-left: 3%;
+    padding-bottom: auto;
+}
+
+div.left_pr {
+    margin: auto;
+    width: 50%;
+    min-height: 230px;
+    vertical-align: text-top;
+    float: left;
+    z-index: 1;
+}
+
+div.right_pr {
+    margin: auto;
+    width: 50%;
+    min-height: 230px; 
+    margin-left: 50%;
+    z-index: 1;
+    vertical-align: middle
+}
+
+.pcpale {
+    color: #9B9B9B;
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    line-height: 24px;
+    text-align: right;
+}
+
+#smallink {
+    margin: auto;
+    padding: 0;
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    color: #0096E6;
+    line-height: 26px;
+    text-decoration: underline;
+}
+
+div.result {
+    margin: auto;
+    padding: 0;
+    padding-bottom: 30px;
+}
+
+.persent {
+    margin: auto;
+    padding-top: 40px;
+    font-family: PTSans-Regular;
+    font-size: 64px;
+    color: #0096E6;
+    line-height: 64px;
+}
+
+/*Страница настроек профиля*/
+
+.tabbar {
+    margin: 0 auto;
+    padding: 30px;
+    background: #FAF9FB;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+form#about, form#passwd {
+    margin: 0 auto;
+    width: 340px;
+    height: auto;
+    vertical-align: middle;
+}
+
+.radio {
+    margin: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    display: none;
+}
+
+label {
+    padding: 30px;
+    padding-left: 5px;
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    color: #212121;
+    line-height: 32px;
+}
+
+input[type="radio"] {
+    border:solid 3px #0096e6;
+}
+
+/*Добавление проекта*/
+
+body.popupground {
+    background: #F0F9FF;
+}
+
+form.project {
+    margin: auto;
+    text-align: left;
+}
+
+textarea {
+    font-family: PTSans-Regular;
+    font-size: 24px;
+    color: #9B9B9B;
+    line-height: 32px;
+    width: 460px;
+    resize: none;
+    text-align: left;
+    background: #FAF9FB;
+}
+
+div#down {
+    position:absolute;
+	bottom: 20px;
+}
+
+div#up {
+    position:absolute; 
+	top: 20px;
+}
+
+.file_upload{
+    padding: 20px;
+    margin-top: 2%;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #0081DE;
+    border-radius: 4px;
+    width: 220px;
+    text-align: center;
+}
+
+.file_upload .button, .file_upload > mark{
+    display: block;
+    cursor: pointer;
+    text-align: center;
+}
+
+.file_upload .button{
+    margin: auto;
+    padding: 0;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 200px;
+    height: 100%;
+    text-align: center;
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    color: #212121;
+}
+
+.file_upload > mark{
+    background: transparent;
+    text-align: center;
+    font-family: PTSans-Regular;
+    font-size: 18px;
+    color: #9A9A9A;
+    padding-bottom: 20px;
+}
+
+.file_upload input[type=file]{
+    position: absolute;
+    top: 0;
+    opacity: 0
+}
+
+img#plus {
+    padding-top: 20px;
+}
+
+/*Страница результатов*/
+
+.bread {
+    font-family: PTSans-Regular;
+    font-size: 20px;
+    color: #9B9B9B;
+    line-height: 26px;
+}

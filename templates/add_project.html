@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+    
+<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+<script src="/static/js/script.js" type="application/javascript"></script>
+
+<title>Yammu - Новый проект</title>
+</head>
+    
+    <body class="popupground">
+        <div id="header">
+            <ul class="menu">
+                <li><a href="index.html"><img src='{{ static_url("img/logo.png")}}' alt="Yammu"/></a></li>
+                <li class="active"><a href="projects.html">Проекты</a></li>
+                <li><a href="timeline.html">Активности</a></li>
+                <li><a href="profile.html">Профиль</a></li>
+                <li><a href="add_project.html"><img id="img_drop" src='{{ static_url("img/quit.png")}}' alt="Отменить" /></a></li>
+            </ul> 
+        </div>
+
+        <div class="grid">
+            <div class="col-1-4">
+            <div id="up">
+                <a href="">< Проекты</a>
+            </div>
+            <div id="down">
+                <a href="">Отменить</a>
+            </div>
+            </div>
+
+            <div class="col-3-4">
+                <form id="project">
+                    <input type="text" name="project" placeholder="  название проекта" class="textline"><br/>
+                    <textarea name="description" placeholder="  описание проекта"></textarea><br/>
+                    <label class="file_upload">
+                        <img src='{{ static_url("img/add_file.png")}}' alt="Плюс" id="plus"/>
+                        <span class="button">Фото проекта</span>
+                        <mark>png или jpg до 5 Мбайт</mark>
+                        <input type="file">
+                    </label>
+                    <button type="submit">Добавить проект</button><br/>
+                </form>
+            </div>
+        </div>
+            
+        <div id="footer">
+            <div class="divider">
+                <img src="../static/img/line.png" alt="Просто линия"/>
+            </div>
+            <div class="right">
+                <p class="pale">
+                    2015<br/>
+                    Дипломная работа<br/>
+                    <a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a>
+                </p>
+            </div>
+        </div>
+    </body>
+
+</html>

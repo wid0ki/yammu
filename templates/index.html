@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+    
+<link rel="stylesheet" type="text/css" href="/static/css/style.css">
+<script src="/static/js/script.js" type="application/javascript"></script>
+    
+<title>Yammu - Контрольные листы для измерения юзабилити</title>
+</head>
+
+<body>
+    <div id="header">
+        <ul class="menu">
+            <li><a href="index.html"><img src='{{ static_url("img/logo.png")}}' alt="Yammu"/></a></li>
+            <li><a href="login.html">Вход</a></li>
+        </ul>  
+    </div>
+    <div id="content">
+        <p class="calling">Куда уходит <span class="highlight">74%</span> твоих пользователей</p>
+        <button type="button" onclick="window.location.href='login.html'">Узнай бесплатно</button>
+    </div>
+    <div id="footer">
+        <div class="left">
+            <p>или продолжай надеяться</p>
+            <img src="../static/img/pray.png" alt="Cкрещенные пальцы"/>
+        </div>
+        <div class="divider">
+            <img src="../static/img/line.png" alt="Просто линия"/>
+        </div>
+        <div class="right">
+            <p class="pale">
+                2015<br/>
+                Дипломная работа<br/>
+                <a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
