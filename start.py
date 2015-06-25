@@ -5,6 +5,8 @@ __author__ = 'wid0ki <laricasorokina@gmail.com>'
 import os.path
 import tornado.ioloop
 import tornado.web
+from tornadomail.message import EmailMessage, EmailMultiAlternatives, EmailFromTemplate
+from tornadomail.backends.smtp import EmailBackend
 
 def Logic():
     pass
@@ -20,6 +22,28 @@ class LoginHandler(tornado.web.RequestHandler):
     def post(self):
         self.set_secure_cookie("user", self.get_argument("name"))
         self.redirect("/projects.html")
+
+class RegisterHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("register.html")
+
+    @property
+    def mail_connection(self):
+        return self.application.mail_connection
+
+    def post(self):
+        print self.get_argument("email")
+        self.set_secure_cookie("user", self.get_argument("email"))
+        message = EmailFromTemplate(
+            'Вас пригласили для тестирования нового проекта',
+            'mail_invite.htm',
+            from_email='yammu@bk.ru',
+            to=[self.get_argument('email')],
+            connection=self.mail_connection
+        )
+        message.send()
+        print "yesss"
+        self.render("login.html")
 
 class ProjectHandler(tornado.web.RequestHandler):
     def get(self, url):
@@ -49,9 +73,27 @@ class ProjectsHandler(tornado.web.RequestHandler):
         self.render("projects.html", projects = prs)
 
 class ResearchHandler(tornado.web.RequestHandler):
-    def get(self):
-
-        self.render("research.html")
+    def get(self, url):
+        pr = {"name" : "Проект банка",
+              "id" : 1,
+              "image_path": os.path.join("/static", "img", "1mbank.png").decode('utf-8'),
+              'description': 'Мы показываем здесь калькулятор для тех, кто попал на страницу заявки, минуя продуктовые, и перечисляем список избранного перед полями для заполнения. А еще можно выбрать какую-то услугу для себя, например, заказать кредитную карту, и оформить такой же пластик для своих сотрудников. Услуги для бизнеса и частных лиц в одной заявке.'}
+        rc = {"id":0, "date":"27.05.2015", "name":"Проверка формы входа", "description": "Ребят, проверяем только новую форму входа по ссылке ingage.com/login. Не забудьте почистить кэш!"}
+        p_md = ["Надёжность", "Функциональность ресурса"]
+        md = [[{"id":0,"name":"Предотвращение пользовательских ошибок", "type":"tester"},
+               {"id":1,"name":"Индикация возникновения случайных ошибок", "type":"both"},
+               {"id":2,"name":"Возможность отмены любого пользовательского действия (принцип Undo)", "type":"expert"}],
+             [{"id":3,"name":"Достаточность необходимого функционала для решения пользовательских задач", "type":"tester"},
+              {"id":4,"name":"Корректность работы функционала", "type":"tester"},
+              {"id":5,"name":"Доступность функционала для пользователей", "type":"tester"}],
+            ]
+        tr = ("Тимченко", " ", " ", "Светлана К.", " ", " ")
+        self.render("research.html",
+                    project = pr,
+                    research = rc,
+                    parent_methods = p_md,
+                    methods = md,
+                    tester = tr)
 
 class SettingsHandler(tornado.web.RequestHandler):
     def get(self, url):
@@ -66,8 +108,23 @@ class ActivityHandler(tornado.web.RequestHandler):
         self.render("timeline.html", researchs = rc)
 
 class PrepareHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("prepare.html")
+    def get(self, url):
+        pr = {"name" : "Проект банка",
+              "id" : 1,
+              "image_path": os.path.join("/static", "img", "1mbank.png").decode('utf-8'),
+              'description': 'Мы показываем здесь калькулятор для тех, кто попал на страницу заявки, минуя продуктовые, и перечисляем список избранного перед полями для заполнения. А еще можно выбрать какую-то услугу для себя, например, заказать кредитную карту, и оформить такой же пластик для своих сотрудников. Услуги для бизнеса и частных лиц в одной заявке.'}
+        p_md = ["Надёжность", "Функциональность ресурса"]
+        md = [[{"id":0,"name":"Предотвращение пользовательских ошибок"},
+               {"id":1,"name":"Индикация возникновения случайных ошибок"},
+               {"id":2,"name":"Возможность отмены любого пользовательского действия (принцип Undo)"}],
+             [{"id":3,"name":"Достаточность необходимого функционала для решения пользовательских задач"},
+              {"id":4,"name":"Корректность работы функционала"},
+              {"id":5,"name":"Доступность функционала для пользователей"}],
+            ]
+        self.render("prepare.html",
+                    project = pr,
+                    parent_methods = p_md,
+                    methods = md)
 
 class ResultHandler(tornado.web.RequestHandler):
     def get(self, url):
@@ -78,19 +135,23 @@ class ResultHandler(tornado.web.RequestHandler):
         pc = 47
         rc = {"id":0, "date":"27.05.2015", "name":"Проверка формы входа", "description": "Тестирование банка"}
         p_md = ["Надёжность", "Функциональность ресурса"]
-        md = [[{"name":"Предотвращение пользовательских ошибок"},
-               {"name":"Индикация возникновения случайных ошибок"},
-               {"name":"Возможность отмены любого пользовательского действия (принцип Undo)"}],
-             [{"name":"Достаточность необходимого функционала для решения пользовательских задач"},
-              {"name":"Корректность работы функционала"},
-              {"name":"Доступность функционала для пользователей"}],
+        md = [[{"id":0,"name":"Предотвращение пользовательских ошибок"},
+               {"id":1,"name":"Индикация возникновения случайных ошибок"},
+               {"id":2,"name":"Возможность отмены любого пользовательского действия (принцип Undo)"}],
+             [{"id":3,"name":"Достаточность необходимого функционала для решения пользовательских задач"},
+              {"id":4,"name":"Корректность работы функционала"},
+              {"id":5,"name":"Доступность функционала для пользователей"}],
             ]
+        rs = ["да", "нет", "5", "нет", "да","4"]
+        tr = ("Тимченко", " ", " ", "Светлана К.", " ", " ")
         self.render("result.html",
                     project = pr,
                     research = rc,
                     participants_count = pc,
                     parent_methods = p_md,
-                    methods = md)
+                    methods = md,
+                    result = rs,
+                    tester = tr)
 
 class AddProjectHandler(tornado.web.RequestHandler):
     def get(self):
@@ -110,6 +171,7 @@ class Application(tornado.web.Application):
             (r"/prepare.html(.*)", PrepareHandler),
             (r"/result.html(.*)", ResultHandler),
             (r"/add_project.html", AddProjectHandler),
+            (r"/register", RegisterHandler),
         ]
         settings = dict(
 			template_path = os.path.join(os.path.dirname(__file__), "templates").decode('utf-8'),
@@ -119,6 +181,14 @@ class Application(tornado.web.Application):
 			autoescape=None,
 			)
         tornado.web.Application.__init__(self, handlers, **settings)
+
+    @property
+    def mail_connection(self):
+        return EmailBackend(
+            'imap.mail.ru', 993, 'yammu@bk.ru',
+            'Diplomaqwerty1994', True,
+            template_loader= tornado.web.template.Loader('./templates/')
+        )
 
 if __name__ == "__main__":
     app = Application()

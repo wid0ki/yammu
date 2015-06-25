@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<!--<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">-->
 <link rel="stylesheet" type="text/css" media="print" href="{{ static_url('css/print.css') }}">
-<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+<!--<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>-->
     
 <link rel="stylesheet" type="text/css" href="/static/css/style.css">
 <script src="/static/js/script.js" type="application/javascript"></script>
     
-<title>{{escape (project['name'])}}|{{escape (research['name'])}}</title>
+<title>{{escape (project['name'])}} | {{escape (research['name'])}}</title>
 </head>
 
 <body name="top">
@@ -26,29 +26,33 @@
     <div class="breadcrumbs">
         <p><a href="project.html/?project_id={{project['id']}}" class="bread">{{project['name']}}</a> > <a href="research.html/{{research['id']}}" class="bread">{{research['name']}}</a></p>
     </div>
-    <div id="researchdescription">
-        <div class="left_pr">
+        <div class="left_pr" style="padding-left:150px;">
             <h2>Результаты</h2>
             <p class="persent">74%<span class="pcpale">/100</span></p><br/>
         </div>
-        <div class="right_pr">
-            <span class="pcpale">{{participants_count}} участники</span>
-            <br/>
-            <button href="#" onClick="window.print();"> Распечатать</button>
-            <a href="" id="smallink" style="padding-left: 20px;">Отправить</a><br/>
+        <div class="right_pr" style="padding-left: 0;">
+            <p class="pcpale" style="float:left;">{{participants_count}} участники</p>
+            <br/><br/>
+            <div style="padding-top: 40px; width: 470px">
+                <button href="#" onClick="window.print();" style="width:200px;"> Распечатать</button>
+                <a href="" id="smallink" style="padding-left: 10px;">Отправить</a><br/>
+            </div>
         </div>
-    </div>
     
     {% for method in methods %}
     <div id="resultmetric">
-        <a href="#" onclick="openbox('extendmetric'); return false">
+        <a href="#" onclick="openbox('extendmetric{{method[-1]['id']}}'); return false">
             <img src="{{ static_url("img/open.png")}}" class="arrow" alt="Стрелка"/>
             {{parent_methods.pop(0)}}
         </a>
-        <div class="extendmetric" style="display: block;">
+        <div id="extendmetric{{method[-1]['id']}}" style="display: none;">
             {% for ch in method %}
-            <p class="scription">{{ch['name']}}</p>
+            <p class="scription">
+                <span style="padding-left: 20px; padding-right:20px; width:40px; float:left;">{{result[ch['id']]}}</span>
+                {{ch['name']}}
+                <span class="pcpale" style="padding-left:20px;">{{tester[ch['id']]}}</span></p>
             {% end %}
+
         </div>
     </div>
     {% end %}
@@ -70,5 +74,4 @@
         </div>
     </div>
 </body>
-
 </html>

@@ -251,7 +251,7 @@ div.projectdescription {
     padding: 0;
 }
 
-#extendresearch, #extendescription, .extendmetric {
+#extendresearch, #extendescription, #extendmetric {
     display: none;
     margin-top: 10px;
     background: #FAF9FB;
@@ -308,7 +308,7 @@ div.right_pr {
     min-height: 230px; 
     margin-left: 50%;
     z-index: 1;
-    vertical-align: middle
+    vertical-align: middle;
 }
 
 .pcpale {
@@ -470,4 +470,21 @@ img#plus {
     font-size: 20px;
     color: #9B9B9B;
     line-height: 26px;
+}
+
+div.pcpale {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+}
+
+/*Страница подготовки исследования*/
+
+input[type=checkbox] {
+    display: inline-block;
+    border: 3px solid #0096E6;
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+    vertical-align: middle;
 }

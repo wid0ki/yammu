@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<link rel="stylesheet" type="text/css" media="print" href="{{ static_url('css/print.css') }}">
+<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+    
+<title>{{escape (project['name'])}} | Новое исследование</title>
+</head>
+
+<body name="top">
+    <div class="drop"></div>
+    <div id="header">
+        <ul class="menu">
+            <li><a href="index.html"><img src='{{ static_url("img/logo.png")}}' alt="Yammu"/></a></li>
+            <li class="active"><a href="../templates/projects.html">Проекты</a></li>
+            <li><a href="timeline.html">Активности</a></li>
+            <li><a href="profile.html">Профиль</a></li>
+            <li><a href="add_project.html"><img id="img_drop" src='{{ static_url("img/plus.png")}}' alt="Добавить проект" /></a></li>
+        </ul> 
+    </div>
+    <div class="breadcrumbs">
+        <a href="project.html/?project_id={{project['id']}}" class="bread">{{project['name']}}</a>
+    </div>
+    
+    <div>
+        <input type="text" name="research" placeholder="  название исследования" class="textline" style="width:460px;"><br/>
+        <textarea name="description" placeholder="  описание исследования" style="width:700px;"></textarea><br/>
+        <p>Выберите факторы и характеристики</p>
+        
+        {% for method in methods %}
+        <div id="resultmetric">
+            <img src="{{ static_url("img/open.png")}}" class="arrow" alt="Стрелка"/>
+            <a href="#" onclick="openbox('extendmetric{{method[-1]['id']}}'); return false">{{parent_methods.pop(0)}}</a>
+            <div id="extendmetric{{method[-1]['id']}}">
+                {% for ch in method %}
+                <p class="scription">
+                    <input type="checkbox" checked="checked">{{ch['name']}}</input>
+                </p>
+                {% end %}
+            </div>
+        </div>
+        {% end %}   
+    <p style="width:460px;">Вы выбрали 3 характеристики, для которой нужны тестировщики. Хотите пригласить кого-нибудь в помощь?</p>
+    <input type="text" name="email" placeholder="  имя или email через запятую " class="textline" style="width:460px;"><br/><br/>
+    </div>
+    <div id="footer">
+        <div class="left">
+            <a href="#">Начать <br/>тестирование</a><br/>
+            <img src='{{ static_url("img/right.png")}}' alt="К началу страницы"/>
+        </div>
+        <div class="divider">
+            <img src="../static/img/line.png" alt="Просто линия"/>
+        </div>
+        <div class="right">
+            <p class="pale">
+                2015<br/>
+                Дипломная работа<br/>
+                <a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

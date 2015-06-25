@@ -2,42 +2,87 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Yammu - Исследование</title>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+<link rel="stylesheet" type="text/css" media="print" href="{{ static_url('css/print.css') }}">
+<script src="{{ static_url('js/script.js') }}" type="application/javascript"></script>
+    
+<title>{{escape (project['name'])}} | {{escape (research['name'])}}</title>
 </head>
 
-<body>
+<body name="top">
+    <div class="drop"></div>
     <div id="header">
-        <ul id="menu">
+        <ul class="menu">
             <li><a href="index.html"><img src='{{ static_url("img/logo.png")}}' alt="Yammu"/></a></li>
-            <li><a href="projects.html">Проекты</a></li>
+            <li class="active"><a href="../templates/projects.html">Проекты</a></li>
             <li><a href="timeline.html">Активности</a></li>
             <li><a href="profile.html">Профиль</a></li>
-            <li><a href="add_project.html"><img src='{{ static_url("img/plus.png")}}' alt="Добавить проект" /></a></li>
-        </ul>  
+            <li><a href="add_project.html"><img id="img_drop" src='{{ static_url("img/plus.png")}}' alt="Добавить проект" /></a></li>
+        </ul> 
     </div>
-    <div id="content">
-        <div id="breadcrumbs"><a href="./">Сайт банка первомайский</a></div>
-        <h1>Проверка формы входа</h1>
-        <p>Ребят, проверяем только новую форму входа по ссылке ingage.com/login. Не забудьте почистить кэш!</p>
-        <div>
-            <h2 id="factor">Надёжность</h2>
-            <ul id="character">
-                <li>
-                    <p>Предотвращение пользовательских ошибок</p>
-                    <input type="radio" name="character1" value="yes">Да<br/>
-                    <input type="radio" name="character1" value="no">Нет<br/>
-                </li>
-            </ul>
+    <div class="breadcrumbs">
+        <a href="project.html/?project_id={{project['id']}}" class="bread">{{project['name']}}</a>
+    </div>
+    
+    <div>
+        <br>
+        <h2>{{research['name']}}</h2>
+        <p style="width:700px;">{{research['description']}}</p>
+
+        {% for method in methods %}
+        <div id="resultmetric">
+            <img src="{{ static_url("img/open.png")}}" class="arrow" alt="Стрелка"/>
+            <a href="#" onclick="openbox('extendmetric{{method[-1]['id']}}'); return false">{{parent_methods.pop(0)}}</a>
+            <div id="extendmetric{{method[-1]['id']}}">
+                {% for ch in method %}
+                <p class="scription">{{ch['name']}}</p>
+                    {% if ch['type'] == 'tester' or 'both' %}
+<input type="radio" name="scale" value="1" onclick="" id="{{ ch['id']}}1"/>
+<label for="{{ ch['id']}}">1</label>
+<input type="radio" name="scale" value="2" onclick="" id="{{ ch['id']}}2"/>
+<label for="{{ ch['id']}}">2</label>
+<input type="radio" name="scale" value="3" onclick="" id="{{ ch['id']}}3"/>
+<label for="{{ ch['id']}}">3</label>
+<input type="radio" name="scale" value="4" onclick="" id="{{ ch['id']}}4"/>
+<label for="{{ ch['id']}}">4</label>
+<input type="radio" name="scale" value="5" onclick="" id="{{ ch['id']}}5"/>
+<label for="{{ ch['id']}}">5</label>
+<input type="radio" name="scale" value="6" onclick="" id="{{ ch['id']}}6"/>
+<label for="{{ ch['id']}}">6</label>
+<input type="radio" name="scale" value="7" onclick="" id="{{ ch['id']}}7"/>
+<label for="{{ ch['id']}}">7</label>
+<input type="radio" name="scale" value="8" onclick="" id="{{ ch['id']}}8"/>
+<label for="{{ ch['id']}}">8</label>
+<input type="radio" name="scale" value="9" onclick="" id="{{ ch['id']}}9"/>
+<label for="{{ ch['id']}}">9</label>
+<input type="radio" name="scale" value="10" onclick="" id="{{ ch['id']}}10"/>
+<label for="{{ ch['id']}}">10</label>
+                    {% else %}
+<input type="radio" name="scale" value="1" onclick="" id="{{ ch['id']}}1"/>
+<label for="{{ ch['id']}}">да</label>
+<input type="radio" name="scale" value="0" onclick="" id="{{ ch['id']}}0"/>
+<label for="{{ ch['id']}}">нет</label>
+                    {% end %}
+            {% end %}
+            </div>     
+        </div>
+        {% end %}   
+    
+    <div id="footer">
+        <div class="left">
+            <a href="#"> Закончить <br/>тестирование</a><br/>
+            <img src='{{ static_url("img/right.png")}}' alt="К началу страницы"/>
+        </div>
+        <div class="divider">
+            <img src="../static/img/line.png" alt="Просто линия"/>
+        </div>
+        <div class="right">
+            <p class="pale">
+                2015<br/>
+                Дипломная работа<br/>
+                <a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a>
+            </p>
         </div>
     </div>
-    <div id="footer">
-        <a href="">
-            Завершить работу<br/>
-            <img src="img/right.png" alt="Переход"/>
-        </a>
-
-        <p>2015<br/>Дипломная работа<br/><a href="http://www.twitter.com/wid0ki" target="_blank">@wid0ki</a></p>
-    </div>
 </body>
-
 </html>
