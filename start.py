@@ -187,7 +187,7 @@ class Application(tornado.web.Application):
         return EmailBackend(
             'imap.mail.ru', 993, 'yammu@bk.ru',
             'Diplomaqwerty1994', True,
-            template_loader= tornado.web.template.Loader('./templates/')
+            template_loader= tornado.web.template.Loader('templates/')
         )
 
 if __name__ == "__main__":
