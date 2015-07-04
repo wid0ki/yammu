@@ -5,162 +5,389 @@ __author__ = 'wid0ki <laricasorokina@gmail.com>'
 import os.path
 import tornado.ioloop
 import tornado.web
-from tornadomail.message import EmailMessage, EmailMultiAlternatives, EmailFromTemplate
-from tornadomail.backends.smtp import EmailBackend
+import hashlib
+import smtplib
+import psycopg2
+from tornado.ioloop import IOLoop
+from tornado.httpserver import HTTPServer
 
-def Logic():
-    pass
+def LoginUser(self):
+    # Рабочий пользователь widoki@me.com и пароль qwerty
+    cur = self.conn.cursor()
+    cur.execute("SELECT id, passwd FROM \"user\" WHERE email=%s", (self.get_argument("email"),))
+    uid = cur.fetchone()
 
-class MainHandler(tornado.web.RequestHandler):
+    if uid[1] == hashlib.md5(self.get_argument("email")+self.get_argument("password")).hexdigest():
+        self.set_cookie("user_id", str(uid[0]))
+        return True
+    else:
+        return False
+
+def GetProject(self, project_id):
+    cur = self.conn.cursor()
+    cur.execute("SELECT user_id, name, description, picture_path, status FROM project "
+                "WHERE id = %s", (project_id,))
+    prec = cur.fetchone()
+    pr = {"id" : project_id,
+         "user_id": prec[0],
+         "name" : prec[1],
+         "description": prec[2],
+         "image_path":prec[3],
+         "status": prec[4],
+         }
+    return pr
+
+def nGetProject(self):
+    cur = self.conn.cursor()
+    cur.execute("SELECT id, name, description, picture_path, status FROM project "
+                "WHERE user_id = %s", self.get_cookie("user_id"))
+    prec = cur.fetchall()
+    prs = []
+    for p in prec:
+        prs += [{"id" : p[0],
+                "user_id": self.get_cookie("user_id"),
+                "name" : p[1],
+                "description": p[2],
+                "image_path":p[3],
+                "status": p[4],
+                }]
+    return prs
+
+def GetResearch(self, research_id):
+    cur = self.conn.cursor()
+    cur.execute("SELECT id, date, description, name FROM research "
+                "WHERE id = %s", [research_id])
+    prec = cur.fetchone()
+    rc = {"id": prec[0],
+          "date": prec[1],
+          "description": prec[2],
+          "name": prec[3]}
+    return rc
+
+def SetResearch(self, pui):
+    cur = self.conn.cursor()
+    cur.execute("INSERT INTO research (id, name, project_id, user_id, date, description) "
+                "VALUES (DEFAULT, %s, %s, %s, CURRENT_DATE, %s)",
+                [self.get_argument("research"), pui, self.get_cookie("user_id"),
+                 self.get_argument("description"),])
+    self.conn.commit()
+    rc = GetResearch(self, GetLastResearchId(self))
+    return rc
+
+def GetLastResearchId(self):
+    cur = self.conn.cursor()
+    cur.execute("SELECT id FROM research ORDER BY id DESC LIMIT 1")
+    prec = cur.fetchone()
+    return prec[0]
+
+def nGetResearch(self, project_id):
+    cur = self.conn.cursor()
+    cur.execute("SELECT id, name, status, date, description FROM research "
+                "WHERE project_id = %s", (project_id, ))
+    prec = cur.fetchall()
+    rc = []
+    if prec:
+        for p in prec:
+            rc += [{
+                "id" : p[0],
+                "date" : p[3],
+                "name" : p[1],
+                "description" : p[4],
+                "status": p[2],
+            }]
+    return rc
+
+def nGetResearchU(self):
+    cur = self.conn.cursor()
+    cur.execute("SELECT research.id, research.date, research.name, research.description "
+                "FROM research, user2research WHERE research.id = user2research.research_id "
+                "AND (user2research.user_id = %s OR user2research.invited_id = %s) "
+                "GROUP BY research.id", (self.get_cookie("user_id"), self.get_cookie("user_id")))
+    prec = cur.fetchall()
+    rc = []
+    for p in prec:
+        rc += [{"id":p[0], "date":p[1], "name":p[2], "description":p[3]}]
+    return rc
+
+def GetParticipants(self, project_id):
+    cur = self.conn.cursor()
+    cur.execute("SELECT COUNT(user2research.user_id) FROM research, user2research "
+                "WHERE user2research.research_id = research.id AND research.project_id = %s",
+                (project_id,))
+    pc = cur.fetchone()
+    return pc[0]+1
+
+def GetUser(self):
+    cur = self.conn.cursor()
+    cur.execute("SELECT id, tarif_id, name, email, subscribe, passwd FROM \"user\""
+                "WHERE id = %s",(self.get_cookie("user_id"),))
+    prec = cur.fetchone()
+    usr = {"id": prec[0], "name": prec[2], "email": prec[3], "subscribe": prec[4], "passwd": prec[5]}
+    return usr
+
+def GetSub(self):
+    cur = self.conn.cursor()
+    cur.execute("SELECT subscribe FROM \"user\""
+                "WHERE id = %s",(self.get_cookie("user_id"),))
+    prec = cur.fetchone()
+    return {
+        'never': ['checked', '', '', ''],
+        'asis': ['', 'checked', '', ''],
+        'daily':['', '', 'checked', ''],
+        'week': ['', '', '', 'checked'],
+    }.get(prec[0], '')
+
+def GetScore(self, project_id):
+    sc = 71
+    return sc
+
+def GetMethod(self):
+    cur = self.conn.cursor()
+    cur.execute("SELECT id, parent_id, name FROM method")
+    p_md = []
+    md = []
+    sub = []
+    parent = 1
+    prec = cur.fetchall()
+    for p in prec:
+        if p[0] == p[1]:
+            p_md += [p[2]]
+        else:
+            if parent == p[1]:
+                sub += [{"id":p[0], "name":p[2]}]
+            else:
+                md += [sub]
+                parent = p[1]
+                sub = []
+    return [p_md, md]
+
+def GetCheckedMethod(self):
+    cur = self.conn.cursor()
+    cur.execute("SELECT id, parent_id, name, type, tester FROM method")
+    prec = cur.fetchall()
+    checked = self.request.arguments['characters']
+    parent = 1
+    p_id = [parent]
+    p_md = []
+    sub = []
+    md = []
+    for p in prec:
+        if str(p[0]) in checked:
+            if parent == p[1]:
+                sub += [{"id":p[0], "name":p[2], "type":p[3], "tester":p[4]}]
+                cur.execute("INSERT INTO research2method(research_id, method_id) VALUES ( %s, %s)",
+                            (GetLastResearchId(self), p[0],))
+                self.conn.commit()
+            else:
+                md += [sub]
+                parent = p[1]
+                p_id += [parent]
+                sub = []
+
+    for p in prec:
+        if p[0] in p_id:
+            p_md += [p[2]]
+    return [p_md, md]
+
+def GetResearchMethod(self):
+    cur = self.conn.cursor()
+    cur.execute("SELECT method.id, method.parent_id, method.name, method.type, method.tester "
+                "FROM research2method, method WHERE research2method.method_id = method.id AND "
+                "research2method.research_id = %s", (GetLastResearchId(self),))
+    prec = cur.fetchall()
+    parent = 1
+    p_md = []
+    sub = []
+    md = []
+    for p in prec:
+        if parent == p[1]:
+            sub += [{"id":p[0], "name":p[2], "type":p[3], "tester":p[4]}]
+        else:
+            md += [sub]
+            sub = []
+            parent = p[1]
+
+    p_md = ['Надёжность', 'Единообразие']
+
+    return [p_md, md]
+
+class BaseHandler(tornado.web.RequestHandler):
+    @property
+    def conn(self):
+        try:
+            conn = psycopg2.connect("dbname=app user=larasorokina password=qwerty host='localhost' password='dbpass'")
+            conn.autocommit = True
+            return conn
+        except:
+            print "Unable to connect to the database"
+
+class MainHandler(BaseHandler):
     def get(self):
         self.render("index.html")
 
-class LoginHandler(tornado.web.RequestHandler):
+class LoginHandler(BaseHandler):
     def get(self):
         self.render("login.html")
 
     def post(self):
-        self.set_secure_cookie("user", self.get_argument("name"))
-        self.redirect("/projects.html")
+        if LoginUser(self):
+            self.render("projects.html", projects = nGetProject(self))
+        else:
+            self.render("login.html")
 
-class RegisterHandler(tornado.web.RequestHandler):
+class RegisterHandler(BaseHandler):
     def get(self):
         self.render("register.html")
+
+    def post(self):
+        to = self.get_argument("email")
+        # isert app email
+        gmail_user = ''
+        # isert email password
+        gmail_pwd = ''
+        smtpserver = smtplib.SMTP("smtp.mail.ru", 465)
+        smtpserver.ehlo()
+        smtpserver.starttls()
+        smtpserver.ehlo()
+        smtpserver.login(gmail_user, gmail_pwd)
+        header = 'To:' + to + '\n' + 'From: ' + gmail_user + '\n' + 'Subject: Вас пригласили для тестирования нового проекта\n'
+        msg = header.encode('utf-8') + "meow"
+        smtpserver.sendmail(gmail_user, to, msg)
+        smtpserver.close()
+        print "done"
+        self.set_header("Content-Type", "html5")
+        self.write(self.get_argument("mes"))
+        self.render("login.html")
+
+class ProjectHandler(BaseHandler):
+    def get(self, url):
+        pui = self.get_argument("project_id")
+        self.render("project.html",
+                    researchs = nGetResearch(self, pui),
+                    project = GetProject(self, pui),
+                    participants_count = GetParticipants(self, pui),
+                    score = GetScore(self, pui))
+
+class ProjectsHandler(BaseHandler):
+    def get(self):
+        self.render("projects.html", projects = nGetProject(self))
+
+class ResearchHandler(BaseHandler):
+    def get(self, url):
+        self.render("research.html",
+                    project = GetProject(self, self.get_argument("project_id")),
+                    research = GetResearch(self, GetLastResearchId(self)),
+                    parent_methods = GetResearchMethod(self)[0],
+                    methods = GetResearchMethod(self)[1])
+
+    def post(self, url):
+        rs = ["да", "нет", "5", "нет", "да","4"]
+        sc = 76
+        pr = GetProject(self)
+        print "meow"
+        self.render("result.html",
+                    project = pr,
+                    research = GetResearch(GetLastResearchId(self)),
+                    participants_count = GetParticipants(pr["id"]),
+                    parent_methods = GetResearchMethod(self)[0],
+                    methods = GetResearchMethod(self)[1],
+                    result = rs,
+                    score  = sc)
+
+class SettingsHandler(BaseHandler):
+    def get(self, url):
+        self.render("profile.html", person = GetUser(self), sub = GetSub(self))
+
+class ActivityHandler(BaseHandler):
+    def get(self, url):
+        self.render("timeline.html", researchs = nGetResearchU(self))
+
+class PrepareHandler(BaseHandler):
+    def get(self, url):
+        self.render("prepare.html",
+                    project = GetProject(self,self.get_argument("project_id")),
+                    parent_methods = GetMethod(self)[0],
+                    methods = GetMethod(self)[1],
+                    research_id = GetLastResearchId(self))
+
+    def post(self, url):
+        GetCheckedMethod(self)
+        self.redirect("research.html?project_id="+self.get_argument("project_id"))
+        # self.render("research.html",
+        #             project = GetProject(self, self.get_argument("project_id")),
+        #             research = GetResearch(self, GetLastResearchId(self)),
+        #             parent_methods = GetCheckedMethod(self)[0],
+        #             methods = GetCheckedMethod(self)[1])
+
+class ResultHandler(BaseHandler):
+    def get(self, url):
+        rs = ["да", "нет", "5", "нет", "да","4"]
+        sc = 75
+        self.render("result.html",
+                    project = GetProject(self, self.get_argument("project_id")),
+                    research = GetResearch(self, GetLastResearchId(self)),
+                    participants_count = GetParticipants(self,self.get_argument("project_id")),
+                    parent_methods = GetResearchMethod(self)[0],
+                    methods = GetResearchMethod(self)[1],
+                    result = rs,
+                    score  = sc)
 
     @property
     def mail_connection(self):
         return self.application.mail_connection
 
     def post(self):
-        print self.get_argument("email")
-        self.set_secure_cookie("user", self.get_argument("email"))
-        message = EmailFromTemplate(
-            'Вас пригласили для тестирования нового проекта',
-            'mail_invite.htm',
-            from_email='yammu@bk.ru',
-            to=[self.get_argument('email')],
-            connection=self.mail_connection
-        )
-        message.send()
-        print "yesss"
-        self.render("login.html")
+        # to = self.get_argument("email")
+        # # isert app email
+        # gmail_user = ''
+        # # isert email password
+        # gmail_pwd = ''
+        # smtpserver = smtplib.SMTP("smtp.mail.ru", 465)
+        # smtpserver.ehlo()
+        # smtpserver.starttls()
+        # smtpserver.ehlo()
+        # smtpserver.login(gmail_user, gmail_pwd)
+        # header = 'To:' + to + '\n' + 'From: ' + gmail_user + '\n' + 'Subject: Результаты тестирования вашего проекта\n'
+        # msg = header.encode('utf-8') + "meow"
+        # smtpserver.sendmail(gmail_user, to, msg)
+        # smtpserver.close()
+        # self.set_header("Content-Type", "html5")
+        # self.write(self.get_argument("mes"))
 
-class ProjectHandler(tornado.web.RequestHandler):
-    def get(self, url):
-        img = os.path.join("/static", "img", "1mbank.png").decode('utf-8')
-        pr = {"name" : "Проект банка",
-              "id" : self.get_argument("project_id"),
-              "image_path": img,
-              'description': 'Мы показываем здесь калькулятор для тех, кто попал на страницу заявки, минуя продуктовые, и перечисляем список избранного перед полями для заполнения. А еще можно выбрать какую-то услугу для себя, например, заказать кредитную карту, и оформить такой же пластик для своих сотрудников. Услуги для бизнеса и частных лиц в одной заявке.'}
-        pc = 5
-        rc = [{"id":0, "date":"27.05.2015", "description": "Тестирование банка"},
-              {"id":1, "date":"17.06.2015", "description": "Тестирование страницы входа"},]
-        self.render("project.html",
-                    researchs = rc,
-                    project = pr,
-                    participants_count = pc)
-
-class ProjectsHandler(tornado.web.RequestHandler):
-    def get(self):
-        img1 = os.path.join("/static", "img", "1mbank.png").decode('utf-8')
-        img2 = os.path.join("/static", "img", "ebank.png").decode('utf-8')
-        img3 = os.path.join("/static", "img", "sklad.png").decode('utf-8')
-        img4 = os.path.join("/static", "img", "eda.png").decode('utf-8')
-        prs = [{"name":"Банк Первомайский", "id":0, "image_path": img1},
-               {"name":"ИБ Первомайский", "id":1, "image_path": img2},
-               {"name":"Южный склад", "id":3, "image_path": img3},
-               {"name":"IRecommend", "id":4, "image_path": img4},]
-        self.render("projects.html", projects = prs)
-
-class ResearchHandler(tornado.web.RequestHandler):
-    def get(self, url):
-        pr = {"name" : "Проект банка",
-              "id" : 1,
-              "image_path": os.path.join("/static", "img", "1mbank.png").decode('utf-8'),
-              'description': 'Мы показываем здесь калькулятор для тех, кто попал на страницу заявки, минуя продуктовые, и перечисляем список избранного перед полями для заполнения. А еще можно выбрать какую-то услугу для себя, например, заказать кредитную карту, и оформить такой же пластик для своих сотрудников. Услуги для бизнеса и частных лиц в одной заявке.'}
-        rc = {"id":0, "date":"27.05.2015", "name":"Проверка формы входа", "description": "Ребят, проверяем только новую форму входа по ссылке ingage.com/login. Не забудьте почистить кэш!"}
-        p_md = ["Надёжность", "Функциональность ресурса"]
-        md = [[{"id":0,"name":"Предотвращение пользовательских ошибок", "type":"tester"},
-               {"id":1,"name":"Индикация возникновения случайных ошибок", "type":"both"},
-               {"id":2,"name":"Возможность отмены любого пользовательского действия (принцип Undo)", "type":"expert"}],
-             [{"id":3,"name":"Достаточность необходимого функционала для решения пользовательских задач", "type":"tester"},
-              {"id":4,"name":"Корректность работы функционала", "type":"tester"},
-              {"id":5,"name":"Доступность функционала для пользователей", "type":"tester"}],
-            ]
-        tr = ("Тимченко", " ", " ", "Светлана К.", " ", " ")
-        self.render("research.html",
-                    project = pr,
-                    research = rc,
-                    parent_methods = p_md,
-                    methods = md,
-                    tester = tr)
-
-class SettingsHandler(tornado.web.RequestHandler):
-    def get(self, url):
-        pr = {'name':'Larisa', 'email':'widoki@me.com'}
-        self.render("profile.html", person = pr)
-
-class ActivityHandler(tornado.web.RequestHandler):
-    def get(self, url):
-        rc = [{"id":0, "date":"27.05.2015", "description": "Тестирование банка"},
-              {"id":1, "date":"17.06.2015", "description": "Тестирование страницы входа"},
-              {"id":2, "date":"17.06.2015", "description": "Тестирование страницы входа"},]
-        self.render("timeline.html", researchs = rc)
-
-class PrepareHandler(tornado.web.RequestHandler):
-    def get(self, url):
-        pr = {"name" : "Проект банка",
-              "id" : 1,
-              "image_path": os.path.join("/static", "img", "1mbank.png").decode('utf-8'),
-              'description': 'Мы показываем здесь калькулятор для тех, кто попал на страницу заявки, минуя продуктовые, и перечисляем список избранного перед полями для заполнения. А еще можно выбрать какую-то услугу для себя, например, заказать кредитную карту, и оформить такой же пластик для своих сотрудников. Услуги для бизнеса и частных лиц в одной заявке.'}
-        p_md = ["Надёжность", "Функциональность ресурса"]
-        md = [[{"id":0,"name":"Предотвращение пользовательских ошибок"},
-               {"id":1,"name":"Индикация возникновения случайных ошибок"},
-               {"id":2,"name":"Возможность отмены любого пользовательского действия (принцип Undo)"}],
-             [{"id":3,"name":"Достаточность необходимого функционала для решения пользовательских задач"},
-              {"id":4,"name":"Корректность работы функционала"},
-              {"id":5,"name":"Доступность функционала для пользователей"}],
-            ]
-        self.render("prepare.html",
-                    project = pr,
-                    parent_methods = p_md,
-                    methods = md)
-
-class ResultHandler(tornado.web.RequestHandler):
-    def get(self, url):
-        pr = {"name" : "Проект банка",
-              "id" : 1,
-              "image_path": os.path.join("/static", "img", "1mbank.png").decode('utf-8'),
-              'description': 'Мы показываем здесь калькулятор для тех, кто попал на страницу заявки, минуя продуктовые, и перечисляем список избранного перед полями для заполнения. А еще можно выбрать какую-то услугу для себя, например, заказать кредитную карту, и оформить такой же пластик для своих сотрудников. Услуги для бизнеса и частных лиц в одной заявке.'}
-        pc = 47
-        rc = {"id":0, "date":"27.05.2015", "name":"Проверка формы входа", "description": "Тестирование банка"}
-        p_md = ["Надёжность", "Функциональность ресурса"]
-        md = [[{"id":0,"name":"Предотвращение пользовательских ошибок"},
-               {"id":1,"name":"Индикация возникновения случайных ошибок"},
-               {"id":2,"name":"Возможность отмены любого пользовательского действия (принцип Undo)"}],
-             [{"id":3,"name":"Достаточность необходимого функционала для решения пользовательских задач"},
-              {"id":4,"name":"Корректность работы функционала"},
-              {"id":5,"name":"Доступность функционала для пользователей"}],
-            ]
         rs = ["да", "нет", "5", "нет", "да","4"]
-        tr = ("Тимченко", " ", " ", "Светлана К.", " ", " ")
+        sc = 75
         self.render("result.html",
-                    project = pr,
-                    research = rc,
-                    participants_count = pc,
-                    parent_methods = p_md,
-                    methods = md,
+                    project = GetProject(self, self.get_argument("project_id")),
+                    research = GetResearch(self, GetLastResearchId(self)),
+                    participants_count = GetParticipants(self,self.get_argument("project_id")),
+                    parent_methods = GetResearchMethod(self)[0],
+                    methods = GetResearchMethod(self)[1],
                     result = rs,
-                    tester = tr)
+                    score  = sc)
 
-class AddProjectHandler(tornado.web.RequestHandler):
+class AddProjectHandler(BaseHandler):
     def get(self):
         self.render("add_project.html")
 
+    def post(self):
+        cur = self.conn.cursor()
+        cur.execute("INSERT INTO project (user_id, name, description) VALUES (%s, %s, %s)",
+                   (self.get_cookie("user_id"), self.get_argument("project"),
+                    self.get_argument("description"),))
+        self.render("projects.html", projects = nGetProject(self))
+
 class Application(tornado.web.Application):
     def __init__(self):
+        settings = dict(
+			template_path = os.path.join(os.path.dirname(__file__), "templates").decode('utf-8'),
+			static_path = os.path.join(os.path.dirname(__file__), "static").decode('utf-8'),
+            cookie_secret = "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
+			debug=True,
+			autoescape=None,
+			)
+
         handlers = [
-            (r"/", MainHandler),
+            (r".", MainHandler),
             (r"/index.html", MainHandler),
             (r"/login.html", LoginHandler),
             (r"/project.html/(.*)", ProjectHandler,),
@@ -171,24 +398,10 @@ class Application(tornado.web.Application):
             (r"/prepare.html(.*)", PrepareHandler),
             (r"/result.html(.*)", ResultHandler),
             (r"/add_project.html", AddProjectHandler),
-            (r"/register", RegisterHandler),
+            (r"/register.html", RegisterHandler),
+            (r'/(favicon\.ico)', tornado.web.StaticFileHandler, {"path": settings["static_path"]}),
         ]
-        settings = dict(
-			template_path = os.path.join(os.path.dirname(__file__), "templates").decode('utf-8'),
-			static_path = os.path.join(os.path.dirname(__file__), "static").decode('utf-8'),
-            cookie_secret = "61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
-			debug=True,
-			autoescape=None,
-			)
         tornado.web.Application.__init__(self, handlers, **settings)
-
-    @property
-    def mail_connection(self):
-        return EmailBackend(
-            'imap.mail.ru', 993, 'yammu@bk.ru',
-            'Diplomaqwerty1994', True,
-            template_loader= tornado.web.template.Loader('templates/')
-        )
 
 if __name__ == "__main__":
     app = Application()
